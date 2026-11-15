@@ -19,7 +19,9 @@ Implemented as optional screen-category events. The ignored `.env.local` has the
 
 The event sanitizer preserves the required project token, temporary anonymous `distinct_id`, and explicit `$process_person_profile: false`, together with the fixed screen category. It reconstructs the event from an allowlist, removing URL, referrer and profile data. Captures wait for the SDK's `loaded` callback. Standard headless browsers are intentionally excluded by PostHog's bot filter; verify real ingestion in a regular browser session.
 
-Authenticated GitHub access confirmed that wizard pull request [#1](https://github.com/danielporebski/doroboty-ai/pull/1) is open. That proposal uses `VITE_POSTHOG_KEY` and a different capture/identity configuration. This implementation uses `VITE_POSTHOG_PROJECT_TOKEN` and must be reviewed as an alternative, without combining the two SDK initializations.
+Wizard pull request [#1](https://github.com/danielporebski/doroboty-ai/pull/1) was merged into `main` while this implementation was being prepared. Its `VITE_POSTHOG_KEY` does not match the owner's Netlify configuration, and its separate initialization/identity calls do not satisfy this task's fixed-category data boundary. The follow-up consolidates tracking in `src/features/analytics/` using `VITE_POSTHOG_PROJECT_TOKEN`, removes the redundant wizard initialization/hooks and retains all original domain actions. No unrelated source changes arrived with that merge.
+
+The lockfile retains the tested PostHog SDK 1.447.15. An attempt to adopt the wizard's 1.450.0 was rejected by the local npm minimum-release-age policy; that policy was not bypassed.
 
 ## Review
 
