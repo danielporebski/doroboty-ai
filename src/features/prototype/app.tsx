@@ -17,6 +17,7 @@ import {
 import { EmployerJobs, EmployerJobEditor, CompanyEditor } from "./employer";
 import { SettingsPage, PrivacyPage } from "./settings";
 import { CasePage } from "./case";
+import { ScreenTracker } from "../analytics/screen-tracker";
 function AppRoutes() {
   return (
     <Routes>
@@ -151,6 +152,7 @@ export function App() {
   return (
     <PrototypeProvider>
       <HashRouter>
+        <ScreenTracker />
         <AppRoutes />
       </HashRouter>
     </PrototypeProvider>

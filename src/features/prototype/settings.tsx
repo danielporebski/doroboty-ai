@@ -141,11 +141,21 @@ export function PrivacyPage() {
           Pre-rozmowa z własnym nagraniem, jej transkrypcje i raport są usuwane po 7 dniach od
           nagrania przy otwarciu aplikacji i co minutę podczas jej działania. Gdy aplikacja jest
           zamknięta, dane zostaną usunięte przy kolejnym uruchomieniu. Starsze nagrania bez daty są
-          usuwane od razu. Używaj własnego urządzenia lub osobnego profilu przeglądarki. Aplikacja
-          nie wysyła ich do bazy, dostawcy AI ani systemu analitycznego. Każda osoba korzystająca z
-          tej przeglądarki może odczytać zapisane dane. Plik eksportu zawiera cały lokalny
-          scenariusz, w tym notatki, nagrania i transkrypcje pre-rozmów. Każda osoba mająca plik
-          może odczytać jego zawartość.
+          usuwane od razu. Używaj własnego urządzenia lub osobnego profilu przeglądarki. Treść
+          profilu, aplikacji, CV, notatek, transkrypcji i nagrań pozostaje lokalna; aplikacja nie
+          wysyła jej do bazy, dostawcy AI ani PostHoga. Każda osoba korzystająca z tej przeglądarki
+          może odczytać zapisane dane. Plik eksportu zawiera cały lokalny scenariusz, w tym notatki,
+          nagrania i transkrypcje pre-rozmów. Każda osoba mająca plik może odczytać jego zawartość.
+        </p>
+        <p>
+          Jeśli właściciel wdrożenia włączy PostHoga, aplikacja wyśle do projektu w europejskim
+          regionie PostHog nazwę zdarzenia i stałą kategorię odwiedzanego ekranu. SDK dołącza też
+          tymczasowy, anonimowy identyfikator techniczny, który nie jest zapisywany w przeglądarce
+          ani łączony z danymi prototypu. Aplikacja nie wysyła pełnego adresu strony, wyszukiwań,
+          wartości formularzy, identyfikatorów kandydatów, ofert ani rekordów scenariusza. PostHog
+          może otrzymać adres IP podczas żądania; właściciel projektu powinien włączyć ustawienie
+          „Discard client IP data”, aby PostHog nie zapisywał adresów IP. Zbieranie zdarzeń jest
+          wyłączone, jeśli wdrożenie nie ma jawnej konfiguracji PostHoga.
         </p>
         <p>
           „Resetuj scenariusz” w ustawieniach zastępuje Twoje zmiany danymi początkowymi. Aby usunąć
