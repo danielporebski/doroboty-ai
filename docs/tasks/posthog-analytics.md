@@ -27,6 +27,8 @@ The lockfile retains the tested PostHog SDK 1.447.15. An attempt to adopt the wi
 
 A separate source review found that dropping `distinct_id` would prevent valid ingestion and dropping `$process_person_profile` would lose the no-profile instruction. Both are now retained explicitly. Regression checks cover SDK readiness, route deduplication, disabled/missing configuration, event rejection and exclusion of page/person data. `.env.local` remains ignored and must not be committed.
 
+The first Netlify preview failed during dependency installation because newly installed packages had corporate Artifactory tarball URLs. All 12 affected URLs now point to public npm tarballs; each downloaded artifact was checked against its existing lockfile integrity hash. The package versions and hashes are unchanged. Review new lockfile resolutions after local installs: successful cached builds do not prove that an external build service can fetch corporate registry URLs.
+
 ## Validation
 
 `env VITE_POSTHOG_ENABLED=false PLAYWRIGHT_CHANNEL=chrome ./scripts/verify` passed: formatting, design-system checks, lint, types, 40 unit tests, baseline packet verification, production build and 43 browser journeys. The default Playwright Chromium binary was unavailable, so the already-installed Google Chrome channel was used. An initial restricted run passed the static gate but could not bind the browser-test server; the full rerun with local-server access passed. The build still reports dependency annotation and large-chunk warnings.
