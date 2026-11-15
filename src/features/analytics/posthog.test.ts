@@ -20,7 +20,20 @@ async function initialize() {
   return { tracker, config: sdk.init.mock.calls[0][1] as Partial<PostHogConfig> };
 }
 
-describe("optional screen analytics", () => {
+describe("optional analytics", () => {
+  it("captures each homepage CTA activation independently of screen-view deduplication", async () => {
+    const { tracker, config } = await initialize();
+    tracker.trackViewJobsClick();
+    tracker.trackViewJobsClick();
+    expect(sdk.capture).not.toHaveBeenCalled();
+    config.loaded?.(sdk as never);
+    await vi.waitFor(() => expect(sdk.capture).toHaveBeenCalledTimes(3));
+    expect(sdk.capture.mock.calls.filter(([event]) => event === "view_jobs_clicked")).toEqual([
+      ["view_jobs_clicked", { screen: "home" }, { send_instantly: true }],
+      ["view_jobs_clicked", { screen: "home" }, { send_instantly: true }],
+    ]);
+  });
+
   it("waits for SDK readiness and reports screen categories without paths or searches", async () => {
     const { tracker, config } = await initialize();
     expect(sdk.capture).not.toHaveBeenCalled();
@@ -64,6 +77,17 @@ describe("optional screen analytics", () => {
       },
     });
     expect(beforeSend({ ...event, event: "$autocapture" })).toBeNull();
+    expect(beforeSend({ ...event, event: "view_jobs_clicked" })).toEqual({
+      ...beforeSend(event),
+      event: "view_jobs_clicked",
+    });
+    expect(
+      beforeSend({
+        ...event,
+        event: "view_jobs_clicked",
+        properties: { ...event.properties, screen: "job_list" },
+      }),
+    ).toBeNull();
     expect(
       beforeSend({ ...event, properties: { ...event.properties, screen: "private" } }),
     ).toBeNull();
@@ -85,8 +109,9 @@ describe("optional screen analytics", () => {
   ])("does not initialize when disabled or missing a token: %j", async ({ enabled, token }) => {
     vi.stubEnv("VITE_POSTHOG_ENABLED", enabled);
     vi.stubEnv("VITE_POSTHOG_PROJECT_TOKEN", token);
-    const { trackScreenView } = await import("./posthog");
+    const { trackScreenView, trackViewJobsClick } = await import("./posthog");
     trackScreenView("/");
+    trackViewJobsClick();
     await Promise.resolve();
     expect(sdk.init).not.toHaveBeenCalled();
     expect(sdk.capture).not.toHaveBeenCalled();

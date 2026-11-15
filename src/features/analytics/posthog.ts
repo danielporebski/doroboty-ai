@@ -1,6 +1,7 @@
 import type { BeforeSendFn } from "posthog-js";
 
 const eventName = "prototype_screen_viewed";
+const viewJobsClickEvent = "view_jobs_clicked";
 const allowedScreens = new Set([
   "home",
   "job_list",
@@ -19,7 +20,7 @@ let clientPromise: Promise<typeof import("posthog-js").default | null> | undefin
 let lastPathname: string | undefined;
 
 const beforeSend: BeforeSendFn = (event) => {
-  if (event.event !== eventName) return null;
+  if (event.event !== eventName && event.event !== viewJobsClickEvent) return null;
 
   const screen = event.properties?.screen;
   const token = event.properties?.token;
@@ -27,6 +28,7 @@ const beforeSend: BeforeSendFn = (event) => {
   if (
     typeof screen !== "string" ||
     !allowedScreens.has(screen) ||
+    (event.event === viewJobsClickEvent && screen !== "home") ||
     typeof token !== "string" ||
     !token ||
     typeof distinctId !== "string" ||
@@ -35,7 +37,7 @@ const beforeSend: BeforeSendFn = (event) => {
     return null;
 
   return {
-    event: eventName,
+    event: event.event,
     uuid: event.uuid,
     timestamp: event.timestamp,
     properties: { token, distinct_id: distinctId, $process_person_profile: false, screen },
@@ -99,5 +101,13 @@ export function trackScreenView(pathname: string) {
 
   void getClient()
     .then((client) => client?.capture(eventName, { screen }))
+    .catch(() => undefined);
+}
+
+export function trackViewJobsClick() {
+  void getClient()
+    .then((client) =>
+      client?.capture(viewJobsClickEvent, { screen: "home" }, { send_instantly: true }),
+    )
     .catch(() => undefined);
 }

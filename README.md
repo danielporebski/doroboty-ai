@@ -28,7 +28,7 @@ Open http://127.0.0.1:3001. No environment file, account, database or additional
 
 ## Optional PostHog analytics
 
-The app's only event property is a fixed screen category in `prototype_screen_viewed` events. It does not send full URLs, query strings, search terms, form values, persona or record IDs, CVs, notes, transcripts or audio. Automatic click/input capture, session replay, person profiles and browser persistence are disabled. PostHog still attaches a temporary anonymous technical ID while the page is open. Analytics remains off unless `VITE_POSTHOG_ENABLED=true` and a project token are both configured.
+The app sends `prototype_screen_viewed` for known screens and `view_jobs_clicked` when the homepage's `Zobacz oferty` link is activated. The click event sends immediately after SDK readiness, including native keyboard Enter activation. The only app-provided property is a fixed screen category (`home` for this click). It does not send full URLs, query strings, search terms, form values, persona or record IDs, CVs, notes, transcripts or audio. Automatic click/input capture, session replay, person profiles and browser persistence are disabled. PostHog still attaches a temporary anonymous technical ID while the page is open. Analytics remains off unless `VITE_POSTHOG_ENABLED=true` and a project token are both configured.
 
 For local testing, copy `.env.example` to `.env.local`, then set `VITE_POSTHOG_ENABLED=true` and `VITE_POSTHOG_PROJECT_TOKEN` from the PostHog project's settings. The host defaults to EU ingestion at `https://eu.i.posthog.com`. The project token is a public client token and is included in the built JavaScript when enabled.
 

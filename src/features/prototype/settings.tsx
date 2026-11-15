@@ -149,11 +149,12 @@ export function PrivacyPage() {
         </p>
         <p>
           Jeśli właściciel wdrożenia włączy PostHoga, aplikacja wyśle do projektu w europejskim
-          regionie PostHog nazwę zdarzenia i stałą kategorię odwiedzanego ekranu. SDK dołącza też
-          tymczasowy, anonimowy identyfikator techniczny, który nie jest zapisywany w przeglądarce
-          ani łączony z danymi prototypu. Aplikacja nie wysyła pełnego adresu strony, wyszukiwań,
-          wartości formularzy, identyfikatorów kandydatów, ofert ani rekordów scenariusza. PostHog
-          może otrzymać adres IP podczas żądania; właściciel projektu powinien włączyć ustawienie
+          regionie PostHog nazwę zdarzenia i stałą kategorię odwiedzanego ekranu. Osobne zdarzenie
+          zapisuje kliknięcie „Zobacz oferty” na stronie głównej. SDK dołącza też tymczasowy,
+          anonimowy identyfikator techniczny, który nie jest zapisywany w przeglądarce ani łączony z
+          danymi prototypu. Aplikacja nie wysyła pełnego adresu strony, wyszukiwań, wartości
+          formularzy, identyfikatorów kandydatów, ofert ani rekordów scenariusza. PostHog może
+          otrzymać adres IP podczas żądania; właściciel projektu powinien włączyć ustawienie
           „Discard client IP data”, aby PostHog nie zapisywał adresów IP. Zbieranie zdarzeń jest
           wyłączone, jeśli wdrożenie nie ma jawnej konfiguracji PostHoga.
         </p>
