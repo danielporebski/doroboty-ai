@@ -24,6 +24,7 @@ const entries = [
   "package-lock.json",
   "index.html",
   "vite.config.ts",
+  "netlify.toml",
   "tsconfig.json",
   "vitest.config.ts",
   "playwright.config.ts",

@@ -34,3 +34,7 @@ Run npm run build. Serve dist/ through any static HTTP host. No provider account
 ## Verification
 
 Run ./scripts/verify or npm run check. Browser tests require provisioned Playwright Chromium; a missing test browser does not prevent npm run dev. Do not let an agent install system dependencies automatically.
+
+## Report a problem
+
+Contact Daniel Porebski at daniel.porebski@allegro.com with the browser version, approximate time, steps and visible error. Do not attach recordings, transcripts, CVs or full scenario exports. The planned Netlify link is https://precious-starship-7cc1a2.netlify.app/; availability and current release must be confirmed before a session.

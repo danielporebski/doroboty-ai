@@ -103,6 +103,14 @@ export function SettingsPage() {
           E01 nagrywaj wyłącznie własny głos; nie nagrywaj innych osób ani nie podawaj danych
           identyfikujących lub poufnych.
         </p>
+        <p>
+          Problem z prototypem? Napisz do{" "}
+          <a className="underline" href="mailto:daniel.porebski@allegro.com">
+            daniel.porebski@allegro.com
+          </a>
+          . Podaj przeglądarkę, przybliżony czas i kroki prowadzące do błędu. Nie przesyłaj nagrań,
+          transkrypcji ani plików eksportu.
+        </p>
       </section>
       <ConfirmDialog
         open={pending !== null}
