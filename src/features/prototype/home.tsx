@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { JobCard } from "@/features/jobs/job-card";
+import { trackViewJobsClick } from "@/features/analytics/posthog";
 import { usePrototype } from "./store";
 import { publishedJobs } from "./model";
 import { cn } from "@/lib/utils";
@@ -47,7 +48,11 @@ export default function HomePage() {
               pracy — nie dopiskiem w employer brandingu.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/oferty" className={buttonVariants({ size: "lg" })}>
+              <Link
+                to="/oferty"
+                className={buttonVariants({ size: "lg" })}
+                onClick={trackViewJobsClick}
+              >
                 Zobacz oferty <ArrowRight />
               </Link>
               <Link
