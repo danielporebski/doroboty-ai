@@ -4,6 +4,7 @@ import { ProcessTimeline } from "@/components/process-timeline";
 import { RecordSheet } from "@/components/record-sheet";
 import { CvAttachment } from "./cv-attachment";
 import { MatchScore } from "./match-score";
+import { InterviewAnswers, InterviewReport } from "@/features/pre-interview/answers";
 import { stageLabels, type Application, type Stage } from "./model";
 
 type RecordEvent = { stage: Stage; at: string; note?: string };
@@ -24,7 +25,15 @@ export function ApplicationRecord({
 }: {
   application: Pick<
     Application,
-    "candidateId" | "candidateName" | "jobTitle" | "stage" | "answer" | "cv" | "score" | "summary"
+    | "candidateId"
+    | "candidateName"
+    | "jobTitle"
+    | "stage"
+    | "answer"
+    | "cv"
+    | "score"
+    | "summary"
+    | "preInterview"
   >;
   companyName: string;
   audience: "candidate" | "employer";
@@ -56,6 +65,9 @@ export function ApplicationRecord({
             {stageLabels[application.stage]}
           </span>
           <MatchScore score={application.score} />
+          {application.preInterview && (
+            <span className="pre-badge">Pre-rozmowa · 3 odpowiedzi</span>
+          )}
           {submitted && (
             <span>
               Złożona:{" "}
@@ -68,6 +80,22 @@ export function ApplicationRecord({
         <RecordSheet
           label={candidate ? "Twoja wysłana aplikacja" : "Materiały kandydata"}
           sections={[
+            ...(application.preInterview
+              ? [
+                  {
+                    value: "pre-interview",
+                    label: "Pre-rozmowa",
+                    content: candidate ? (
+                      <>
+                        <h3>Twoje zatwierdzone odpowiedzi</h3>
+                        <InterviewAnswers interview={application.preInterview} expanded />
+                      </>
+                    ) : (
+                      <InterviewReport interview={application.preInterview} />
+                    ),
+                  },
+                ]
+              : []),
             {
               value: "answer",
               label: "Odpowiedź",

@@ -1,4 +1,5 @@
 import { initialState, stateSchema, type State } from "./model";
+import { expireRecordings } from "./retention";
 export const STORAGE_KEY = "doroboty.prototype.v1";
 export const MAX_IMPORT_BYTES = 2_000_000;
 export interface StoragePort {
@@ -9,7 +10,7 @@ export function parseState(raw: string): State {
   if (new TextEncoder().encode(raw).length > MAX_IMPORT_BYTES)
     throw new Error("Plik jest za duży (maksymalnie 2 MB).");
   try {
-    return stateSchema.parse(JSON.parse(raw));
+    return expireRecordings(stateSchema.parse(JSON.parse(raw)));
   } catch {
     throw new Error(
       "Nieprawidłowy plik lub nieobsługiwana wersja danych. Dotychczasowy stan pozostaje bez zmian.",
@@ -17,7 +18,7 @@ export function parseState(raw: string): State {
   }
 }
 export function serializeState(state: State) {
-  return JSON.stringify(state, null, 2);
+  return JSON.stringify(expireRecordings(state), null, 2);
 }
 export function readState(storage: StoragePort | null) {
   if (!storage)
@@ -27,6 +28,7 @@ export function readState(storage: StoragePort | null) {
         "Zapis w przeglądarce jest niedostępny. Zmiany zachowasz przez eksport w ustawieniach.",
       blocked: false,
       original: null,
+      raw: null,
     };
   let raw: string | null = null;
   try {
@@ -36,6 +38,7 @@ export function readState(storage: StoragePort | null) {
       issue: "",
       blocked: false,
       original: null,
+      raw,
     };
   } catch {
     return {
@@ -44,6 +47,7 @@ export function readState(storage: StoragePort | null) {
         "Nie udało się odczytać zapisu. Dotychczasowe dane nie zostaną nadpisane. Pobierz je w ustawieniach, a następnie zaimportuj poprawny plik lub zresetuj scenariusz.",
       blocked: true,
       original: raw,
+      raw,
     };
   }
 }

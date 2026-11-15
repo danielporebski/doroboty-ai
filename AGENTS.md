@@ -8,7 +8,7 @@ Read BRIEF.md, docs/case/CASE_PROTOCOL.md, TODO.md and relevant FEATURES.md entr
 - Participant setup: Node.js 24, npm ci, npm run dev (http://127.0.0.1:3001).
 - Role selection is a simulation, not security.
 - Share plain Zod schemas between forms and domain operations.
-- Preserve human editing and approval. Use synthetic data only.
+- Preserve human editing and approval. Use synthetic scenario data; in optional E01, participants may record only their own voice. Never record another person or include identifying or confidential details.
 - Keep historical case evidence separate from prototype state. Include only baseline in participant packages; source history and instructor materials must not be distributed.
 
 ## Workflow

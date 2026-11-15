@@ -38,4 +38,10 @@ npm run preview
 
 The static output is dist/. Browser checks require an already provisioned Playwright Chromium; starting the app never installs it. See [participant guide](docs/PARTICIPANT_GUIDE.md), [architecture](docs/architecture.md), [current features](FEATURES.md) and [case protocol](docs/case/CASE_PROTOCOL.md).
 
+If Playwright Chromium is absent and Google Chrome is already installed, run `PLAYWRIGHT_CHANNEL=chrome ./scripts/verify` to explicitly use that browser. Report the actual channel used; this does not install browsers or system dependencies.
+
 To distribute a baseline participant package, run npm run package:participant -- /absolute/output/directory. This excludes Git history and instructor source material. Never distribute this repository’s history as a stage-safe packet.
+
+## Participant publishing
+
+See [release and recovery procedure](docs/RELEASE.md) for creating a retained static artifact, checking its identity, smoke checks, rollback, privacy-safe support and the remaining provider/owner decisions. A successful local gate does not publish a participant URL.

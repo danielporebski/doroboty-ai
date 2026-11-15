@@ -38,9 +38,9 @@ export function SettingsPage() {
     }
   }
   function confirm() {
+    setMessage("");
     if (pending === "reset") {
-      reset();
-      setMessage("Przywrócono scenariusz początkowy.");
+      if (reset()) setMessage("Przywrócono scenariusz początkowy.");
     } else if (importState(raw)) {
       setMessage("Dane zostały zaimportowane.");
     }
@@ -52,8 +52,10 @@ export function SettingsPage() {
       <section className="prototype-panel prototype-form">
         <h2>Dane scenariusza</h2>
         <p>
-          Zmiany są zapisane tylko w tej przeglądarce. Wysłanie linku innej osobie nie przenosi
-          Twoich danych. Eksport pozwala przekazać scenariusz lub zachować kopię przed resetem.
+          Zmiany są zapisane tylko w tej przeglądarce. Pre-rozmowy z własnym nagraniem są usuwane po
+          7 dniach przy otwarciu lub podczas działania aplikacji. Wysłanie linku innej osobie nie
+          przenosi Twoich danych. Eksport pozwala przekazać scenariusz lub zachować kopię przed
+          resetem; zawiera również nagrania i transkrypcje pre-rozmów. Pobrane pliki usuń osobno.
         </p>
         <div className="flex flex-wrap gap-3">
           <Button
@@ -97,7 +99,9 @@ export function SettingsPage() {
         <h2>O prototypie</h2>
         <p>
           Wybór osoby zastępuje logowanie. Propozycje AI, Match Score i podsumowania odtwarzają
-          przygotowany scenariusz; nie oceniają kompetencji. Używaj przykładowych danych i CV.
+          przygotowany scenariusz; nie oceniają kompetencji. Używaj przygotowanych danych i CV. W
+          E01 nagrywaj wyłącznie własny głos; nie nagrywaj innych osób ani nie podawaj danych
+          identyfikujących lub poufnych.
         </p>
       </section>
       <ConfirmDialog
@@ -120,17 +124,26 @@ export function PrivacyPage() {
       <h1>Prywatność prototypu</h1>
       <div className="mt-6 space-y-5">
         <p>
-          Ta wersja służy do ćwiczeń i testów interfejsu. Nie wpisuj prawdziwych danych osobowych
-          ani poufnych informacji.
+          Ta wersja służy do ćwiczeń i testów interfejsu. Korzystaj z przygotowanych danych i CV.
+          Podczas E01 możesz nagrać wyłącznie własny głos. Nie nagrywaj innych osób ani nie podawaj
+          imion, danych kontaktowych lub poufnych informacji w nagraniu czy transkrypcji.
         </p>
         <p>
-          Profile, aplikacje i ustawienia pozostają w pamięci tej przeglądarki. Aplikacja nie wysyła
-          ich do bazy, dostawcy AI ani systemu analitycznego. Plik eksportu zawiera cały lokalny
-          scenariusz, w tym notatki.
+          Profile, aplikacje, nagrania i ustawienia pozostają w pamięci tej przeglądarki.
+          Pre-rozmowa z własnym nagraniem, jej transkrypcje i raport są usuwane po 7 dniach od
+          nagrania przy otwarciu aplikacji i co minutę podczas jej działania. Gdy aplikacja jest
+          zamknięta, dane zostaną usunięte przy kolejnym uruchomieniu. Starsze nagrania bez daty są
+          usuwane od razu. Używaj własnego urządzenia lub osobnego profilu przeglądarki. Aplikacja
+          nie wysyła ich do bazy, dostawcy AI ani systemu analitycznego. Każda osoba korzystająca z
+          tej przeglądarki może odczytać zapisane dane. Plik eksportu zawiera cały lokalny
+          scenariusz, w tym notatki, nagrania i transkrypcje pre-rozmów. Każda osoba mająca plik
+          może odczytać jego zawartość.
         </p>
         <p>
-          Możesz usunąć zmiany przyciskiem „Resetuj scenariusz” w ustawieniach lub wyczyścić dane
-          witryny w przeglądarce. Hosting może prowadzić własne logi dostępu.
+          „Resetuj scenariusz” w ustawieniach zastępuje Twoje zmiany danymi początkowymi. Aby usunąć
+          lokalny zapis prototypu, wyczyść dane tej witryny w ustawieniach przeglądarki. Pobrane
+          pliki eksportu i odzyskiwania usuń osobno, np. z folderu Pobrane. Hosting może prowadzić
+          własne logi dostępu. Automatyczne usuwanie nie obejmuje pobranych plików.
         </p>
       </div>
     </section>

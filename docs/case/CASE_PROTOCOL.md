@@ -15,8 +15,9 @@ The primary historical outcome is employer continuation after the first conversa
 - Interactive records and historical evidence are separate. Reset/import does not rewrite the baseline packet.
 - The baseline packet contains 120 historical synthetic journeys with stable IDs/timestamps, plus stage-safe funnel/outcome columns.
 - Candidates edit application answers directly. Legacy source notes/generated copy remain distinct from approved answers in version-1 saves/imports, hidden in the form and preserved on draft save/submission. New candidate drafts use empty legacy fields. Submitted CV and identity are snapshots.
+- Optional E01 pre-interviews keep candidate-approved text/transcript/audio snapshots with the submitted project. Interview drafts stay candidate-only in the UI. Scripted questions, extractive reports and a fixed illustrative credibility percentage are usability stimuli, not model-quality or hiring evidence. Local recordings and transcripts are included in full-scenario exports.
 - Scenario Match Scores are fixed persona examples, not new assessments or historical text-similarity scores. Do not combine them into one trend.
-- No real CVs or personal data. Role selection does not enforce confidentiality.
+- Use synthetic case data and prepared CVs; do not enter real CVs, identifying details or confidential material. The optional E01 recording is an explicit exception for a participant's own voice only. Never record another person. A pre-interview containing personal audio and its transcript/report expires after seven days (cleanup at next launch or while open). Participants use individual devices/browser profiles and delete downloaded exports after the exercise. Reset/site-data clearing removes the browser copy. Role selection does not enforce confidentiality.
 
 ## Stage-safe distribution
 
@@ -26,7 +27,7 @@ Only baseline evidence ships in this version. No release picker, future-stage ge
 
 1. Run the prototype and give the agent the product context.
 2. Analyze currently released evidence and choose a solution direction.
-3. Extend the prototype and test it with a real person using synthetic data.
+3. Extend the prototype and test it with a real person using synthetic case data; if testing E01 recording, record only the participant's own voice and avoid identifying or confidential details.
 4. Share the prototype and explain observations and limits.
 5. Propose a 30-day organizational pilot with assumptions about privacy, permissions, costs and adoption.
 6. Demonstrate the prototype and the reasoning from initial belief to the next experiment.

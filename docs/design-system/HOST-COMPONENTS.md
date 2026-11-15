@@ -66,3 +66,11 @@ The application owns success semantics: run the existing submit operation first,
 | [marketplace.css](../../src/app/marketplace.css)     | React/Base UI source adaptations and offer action separation.                 |
 
 Keep common recipe styling separate from route geometry. Existing code remains subject to review; a component's presence in this catalog does not verify every caller or resolve the open company-page audit.
+
+## E01 pre-interview extension
+
+`PreInterviewEditor` (`src/features/pre-interview/editor.tsx`) composes the existing application sheet, shared Button/Textarea/Checkbox and restart ConfirmDialog. It receives the current project/interview, durable saved-state flag and save/approve callbacks. The question selector uses pressed buttons, not fabricated tabs. Review exposes all source answers before a separate approval action; approved project/materials become read-only. Analysis is explicitly simulated. Save/approve/submit remain separate operations with retained text on persistence failure.
+
+`InterviewAnswers` provides full text, local audio and approved transcripts in candidate/employer records. `InterviewReport` adds employer-only source-linked extractive summaries, prepared follow-up questions and a fixed illustrative percentage. These are new host compositions, not confirmed v1 AI/audio patterns or real assessments. Source links use the current hash route plus whitelisted source IDs, expand the matching details and focus its summary after route changes/reload. Candidate records never mount the report.
+
+`VoiceRecorder` releases microphone tracks on stop, failure and unmount, limits recordings to 60 seconds / 200 KB and requires manually authored transcripts for own recordings. The local synthetic voice sample has matching transcript text. `AudioAnswer` uses native controls, explicitly identifies demo audio and offers transcript recovery on playback errors. `src/app/pre-interview.css` owns this extension's geometry using existing ink/paper/pink, Serif 400 headings and controls. Schemas, source IDs and immutable snapshot contracts live in `src/features/pre-interview/model.ts`; see FEATURES.md CAN-19/CAN-20/EMP-11.

@@ -14,7 +14,7 @@ Storage uses one versioned localStorage key. Import validates schema/version, un
 
 src/features/prototype owns model/storage/state and page compositions. src/features/jobs retains reusable presentation/filter/description logic; src/components/ui owns Base UI controls. Keep changes small.
 
-LocalStorage is origin-specific. Reload preserves state; another browser/device/port starts separately. No cross-tab live synchronization is provided; close other tabs before editing/importing. Hash links reference records in the receiving browser, not transferred records.
+LocalStorage is origin-specific. Reload preserves state; another browser/device/port starts separately. An exclusive Web Lock permits only one editing tab; blocked tabs must reload after the owner closes. Unsupported browsers cannot edit. Writes also compare the last known stored value to reject out-of-band changes. No cross-tab live synchronization is provided. Personal recordings carry recordedAt; seven-day expiry deletes their entire containing pre-interview, including report copies, on load/import/export and every minute/focus while open. Undated legacy audio expires immediately. Hash links reference records in the receiving browser, not transferred records.
 
 ## Evidence and distribution
 

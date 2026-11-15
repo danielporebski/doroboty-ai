@@ -1,0 +1,248 @@
+/* E01 composes Poster People reading surfaces and existing controls. */
+.pre-interview {
+  min-width: 0;
+}
+.pre-interview h3 {
+  margin-bottom: 12px;
+}
+.pre-eyebrow {
+  font-size: 11px;
+  line-height: 1.6;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--gui-text-muted);
+  margin-bottom: 10px;
+}
+.pre-actions,
+.pre-question-nav,
+.pre-answer-modes,
+.pre-list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+.pre-interview [data-slot="button"],
+.pre-list-filters [data-slot="button"] {
+  white-space: normal;
+  max-width: 100%;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: normal;
+}
+.pre-question-nav {
+  padding-block: 18px;
+  margin-block: 18px;
+  border-block: 1px solid var(--pp-line);
+}
+.pre-question-choice[aria-pressed="true"],
+.pre-list-filters [aria-pressed="true"] {
+  background: var(--gui-text);
+  color: white;
+  --control-hover-bg: #333;
+  --control-hover-text: white;
+}
+.pre-answer-modes [aria-pressed="true"] {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+}
+.pre-question {
+  font-size: 20px;
+  line-height: 1.5;
+  margin-block: 12px 18px;
+}
+.pre-answer-label {
+  display: block;
+  margin-block: 20px 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.pre-interview textarea {
+  min-height: 180px;
+  font-size: 16px;
+  line-height: 1.65;
+}
+.pre-status {
+  margin-top: 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.pre-badge {
+  display: inline-block;
+  background: var(--pp-fact);
+  color: var(--gui-text);
+  padding: 4px 9px;
+  border: 1px solid var(--gui-text);
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+.record-meta .pre-badge {
+  margin-top: 0;
+}
+.pre-consent {
+  margin-top: 24px;
+}
+.pre-mismatch {
+  margin-block: 20px;
+  padding-block: 18px;
+  border-block: 1px solid var(--gui-text);
+}
+.pre-mismatch p {
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+.pre-analysis {
+  margin-top: 20px;
+  padding-block: 14px;
+  font-size: 14px;
+}
+.pre-sources {
+  min-width: 0;
+  margin-top: 20px;
+}
+.pre-source {
+  border-top: 1px solid var(--pp-line);
+  padding-block: 17px;
+  scroll-margin-top: 24px;
+}
+.pre-source summary,
+.pre-approved-preview > summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  padding: 5px 0;
+}
+.pre-source summary:hover,
+.pre-approved-preview > summary:hover {
+  background: var(--pp-fact);
+}
+.pre-source summary:focus-visible,
+.pre-approved-preview > summary:focus-visible {
+  outline: 3px solid var(--gui-focus);
+  outline-offset: 4px;
+}
+.pre-answer-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  line-height: 1.75;
+  margin-top: 14px;
+}
+.pre-audio {
+  margin-block: 15px;
+  min-width: 0;
+}
+.pre-audio audio {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+.pre-audio .record-caption {
+  margin-top: 8px;
+}
+.pre-recorder {
+  margin-block: 20px;
+}
+.pre-recorder .record-caption {
+  margin-top: 10px;
+}
+.pre-approved-preview {
+  margin-top: 18px;
+}
+.pre-report h3 {
+  margin-bottom: 14px;
+}
+.pre-simulation {
+  display: inline-block;
+  background: var(--pp-paper);
+  color: var(--gui-text-muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border: 1px solid var(--pp-line);
+  border-radius: 5px;
+  vertical-align: middle;
+}
+.pre-summary-part {
+  padding-block: 18px;
+}
+.pre-summary-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+.pre-summary-part p {
+  margin-top: 6px;
+}
+.pre-source-link {
+  display: inline-block;
+  font-size: 13px;
+  line-height: 1.6;
+  padding-block: 8px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.pre-report-section {
+  border-top: 1px solid var(--pp-line);
+  margin-top: 18px;
+  padding-top: 24px;
+}
+.pre-suggestions {
+  margin-top: 20px;
+  padding-left: 22px;
+}
+.pre-suggestions li {
+  padding-left: 5px;
+  margin-bottom: 20px;
+}
+.pre-suggestions p {
+  margin: 0;
+}
+.pre-credibility {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: baseline;
+}
+.pre-credibility h3 {
+  flex: 1 1 180px;
+}
+.pre-percentage {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+.pre-report-section > p {
+  margin-top: 14px;
+}
+.pre-list-filters {
+  margin-bottom: 24px;
+}
+@media (max-width: 600px) {
+  .pre-question-nav [data-slot="button"] {
+    flex: 1 1 100px;
+  }
+  .pre-interview [data-slot="button"] {
+    min-height: 44px;
+  }
+  .pre-question {
+    font-size: 18px;
+  }
+  .pre-report h3 .pre-simulation {
+    margin-top: 8px;
+  }
+}

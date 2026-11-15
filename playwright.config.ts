@@ -8,6 +8,7 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: "http://127.0.0.1:3106",
+    channel: process.env.PLAYWRIGHT_CHANNEL,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

@@ -67,10 +67,15 @@ const employerNav = [
   ["/app/organizacja", "Organizacja", Building2],
 ] as const;
 export function Shell() {
-  const { state, issue, error, clearError } = usePrototype();
+  const { state, issue, error, clearError, writerStatus, retentionRevision } = usePrototype();
   const person = currentPerson(state);
   const { pathname } = useLocation();
   const workspace = pathname.startsWith("/app") && person;
+  const publicReading =
+    pathname === "/" ||
+    ["/oferty", "/firmy", "/metodologia", "/polityka-prywatnosci"].some((route) =>
+      pathname.startsWith(route),
+    );
   const [menuAt, setMenuAt] = useState<string | null>(null);
   const main = useRef<HTMLElement>(null);
   const lastPath = useRef(pathname);
@@ -105,8 +110,26 @@ export function Shell() {
           {error}
         </p>
       )}
-      <div key={`${state.activePersonId}:${pathname}`}>
-        <Outlet />
+      <div key={`${state.activePersonId}:${pathname}:${retentionRevision}`}>
+        {writerStatus === "ready" || (publicReading && writerStatus !== "pending") ? (
+          <Outlet />
+        ) : (
+          <section className="prototype-section max-w-4xl">
+            <h1>
+              {writerStatus === "pending" ? "Przygotowujemy scenariusz" : "Edycja w jednej karcie"}
+            </h1>
+            <Notice>
+              {writerStatus === "busy"
+                ? "Prototyp jest otwarty w innej karcie. Aby chronić zapisane dane, zamknij ją i odśwież tę stronę."
+                : writerStatus === "unsupported"
+                  ? "Ta przeglądarka nie udostępnia blokady bezpiecznego zapisu. Otwórz prototyp przez HTTPS w aktualnej przeglądarce. Lokalnie użyj adresu 127.0.0.1."
+                  : "Sprawdzamy dostęp do lokalnego zapisu…"}
+            </Notice>
+            {writerStatus !== "pending" && (
+              <Button onClick={() => window.location.reload()}>Odśwież stronę</Button>
+            )}
+          </section>
+        )}
       </div>
     </>
   );

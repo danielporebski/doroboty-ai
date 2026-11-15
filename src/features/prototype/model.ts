@@ -2,6 +2,12 @@ import { z } from "zod";
 import marketplace from "./data/marketplace.json" with { type: "json" };
 import people from "./data/people.json" with { type: "json" };
 import type { JobWithCompany } from "@/features/jobs/types";
+import {
+  approvedInterviewSchema,
+  approveInterview,
+  preInterviewSchema,
+  type PreInterview,
+} from "@/features/pre-interview/model";
 
 const id = z
   .string()
@@ -117,6 +123,7 @@ const applicationSchema = z.object({
   generatedAnswer: text,
   score: z.number().int().min(0).max(100),
   summary: text,
+  preInterview: approvedInterviewSchema.optional(),
   stage: z.enum(stages),
   events: z
     .array(z.object({ stage: z.enum(stages), at: z.iso.datetime(), note: text }))
@@ -129,6 +136,7 @@ const draftSchema = z.object({
   notes: text,
   generated: text,
   answer: text,
+  preInterview: preInterviewSchema.optional(),
 });
 export const stateSchema = z
   .object({
@@ -162,6 +170,8 @@ export const stateSchema = z
     for (const j of s.jobs) if (!companyIds.has(j.companyId)) problem("Unknown job company");
     const keys = new Set<string>();
     for (const a of s.applications) {
+      if (a.preInterview && a.preInterview.project !== a.answer.trim())
+        problem("Interview project does not match the submitted answer");
       const key = `${a.candidateId}:${a.jobId}`;
       if (
         !candidates.has(a.candidateId) ||
@@ -193,6 +203,12 @@ export const stateSchema = z
         pairs.add(key);
       }
     }
+    for (const draft of s.drafts)
+      if (
+        draft.preInterview?.status === "approved" &&
+        draft.preInterview.project !== draft.answer.trim()
+      )
+        problem("Approved interview project does not match the draft");
   });
 export type State = z.infer<typeof stateSchema>;
 export type Person = State["people"][number];
@@ -201,7 +217,15 @@ export type Action =
   | { type: "select_person"; id: string | null }
   | { type: "profile"; value: z.infer<typeof profileSchema> }
   | { type: "toggle_saved"; jobId: string }
-  | { type: "draft"; jobId: string; notes: string; generated: string; answer: string }
+  | {
+      type: "draft";
+      jobId: string;
+      notes: string;
+      generated: string;
+      answer: string;
+      preInterview?: PreInterview;
+    }
+  | { type: "approve_interview"; jobId: string; consent: boolean }
   | {
       type: "submit";
       jobId: string;
@@ -288,9 +312,30 @@ export function transition(
     else s.saved.push({ candidateId: p.id, jobId: action.jobId });
   } else if (action.type === "draft") {
     const p = candidate();
-    const draft = draftSchema.parse({ candidateId: p.id, ...action });
+    if (s.applications.some((x) => x.candidateId === p.id && x.jobId === action.jobId))
+      fail("Wysłana aplikacja jest zamknięta.");
+    const previous = s.drafts.find((x) => x.candidateId === p.id && x.jobId === action.jobId);
+    const preInterview = action.preInterview ?? previous?.preInterview;
+    if (
+      previous?.preInterview?.status === "approved" &&
+      (JSON.stringify(preInterview) !== JSON.stringify(previous.preInterview) ||
+        action.answer.trim() !== previous.preInterview.project)
+    )
+      fail("Zatwierdzonych odpowiedzi i opisu projektu nie można zmieniać.");
+    if (preInterview?.status === "approved" && previous?.preInterview?.status !== "approved")
+      fail("Zatwierdź zapisane odpowiedzi osobnym działaniem.");
+    const draft = draftSchema.parse({ candidateId: p.id, ...action, preInterview });
     s.drafts = s.drafts.filter((x) => !(x.candidateId === p.id && x.jobId === action.jobId));
     s.drafts.push(draft);
+  } else if (action.type === "approve_interview") {
+    const p = candidate();
+    const draft = s.drafts.find((x) => x.candidateId === p.id && x.jobId === action.jobId);
+    if (!action.consent) fail("Zatwierdź własną treść odpowiedzi i transkrypcji.");
+    if (!draft?.preInterview || draft.preInterview.status !== "draft")
+      return fail("Najpierw zapisz szkic pre-rozmowy.");
+    if (draft.preInterview.project !== draft.answer.trim())
+      fail("Opis projektu się zmienił. Przygotuj pytania ponownie.");
+    draft.preInterview = approveInterview(draft.preInterview, now);
   } else if (action.type === "submit") {
     const p = candidate();
     const job = s.jobs.find((x) => x.id === action.jobId && x.publicationStatus === "published");
@@ -298,6 +343,11 @@ export function transition(
     if (!action.consent) fail("Zatwierdź treść i zgodę na przesłanie aplikacji.");
     if (s.applications.some((x) => x.candidateId === p.id && x.jobId === job.id))
       fail("Aplikacja na tę ofertę została już wysłana.");
+    const interview = s.drafts.find(
+      (x) => x.candidateId === p.id && x.jobId === job.id,
+    )?.preInterview;
+    if (interview?.status === "approved" && interview.project !== action.answer.trim())
+      fail("Opis projektu musi odpowiadać zatwierdzonej pre-rozmowie.");
     s.applications.push(
       applicationSchema.parse({
         id: newId,
@@ -312,6 +362,7 @@ export function transition(
         generatedAnswer: action.generated,
         score: p.exampleScore,
         summary: p.exampleSummary,
+        preInterview: interview?.status === "approved" ? interview : undefined,
         stage: "submitted",
         events: [{ stage: "submitted", at: now, note: "" }],
       }),

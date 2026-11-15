@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { JobCard } from "@/features/jobs/job-card";
 import { ApplicationOfferPreview } from "@/features/jobs/application-offer-preview";
+import { PreInterviewEditor } from "@/features/pre-interview/editor";
+import type { PreInterview } from "@/features/pre-interview/model";
 import { usePrototype } from "./store";
 import { currentPerson, publishedJobs, stageLabels, MIN_APPLICATION_ANSWER_LENGTH } from "./model";
 import { PageTitle, Empty, NotFound, Notice } from "./shell";
@@ -236,9 +238,21 @@ export function ApplyPage() {
   const navigate = useNavigate();
   const job = publishedJobs(state).find((x) => x.slug === slug);
   const draft = state.drafts.find((x) => x.jobId === job?.id && x.candidateId === person.id);
+  const savedApplication = state.applications.find(
+    (x) => x.jobId === job?.id && x.candidateId === person.id,
+  );
   const notes = draft?.notes ?? "";
   const generated = draft?.generated ?? "";
   const [answer, setAnswer] = useState(draft?.answer ?? "");
+  const [interview, setInterview] = useState<PreInterview | undefined>(draft?.preInterview);
+  const [interviewBusy, setInterviewBusy] = useState(false);
+  const currentInterview =
+    draft?.preInterview?.status === "approved"
+      ? draft.preInterview
+      : (savedApplication?.preInterview ?? interview);
+  const interviewSaved =
+    JSON.stringify(currentInterview) === JSON.stringify(draft?.preInterview) &&
+    answer.trim() === draft?.answer.trim();
   const [consent, setConsent] = useState(false);
   const [message, setMessage] = useState("");
   const [attempted, setAttempted] = useState(false);
@@ -247,6 +261,12 @@ export function ApplyPage() {
   const submittedOnce = useRef(false);
   const [submitted, setSubmitted] = useState(false);
   const [confettiOrigin, setConfettiOrigin] = useState<ConfettiOrigin | null>(null);
+  useEffect(() => {
+    if (!currentInterview || interviewSaved) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [currentInterview, interviewSaved]);
   useEffect(() => {
     if (!submitted) return;
     const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 900;
@@ -271,7 +291,7 @@ export function ApplyPage() {
     );
   function submit(e: FormEvent) {
     e.preventDefault();
-    if (submittedOnce.current) return;
+    if (submittedOnce.current || interviewBusy) return;
     setAttempted(true);
     if (answerLength < MIN_APPLICATION_ANSWER_LENGTH) {
       answerInput.current?.focus();
@@ -281,7 +301,12 @@ export function ApplyPage() {
       document.getElementById("application-consent")?.focus();
       return;
     }
-    if (run({ type: "submit", jobId: job!.id, notes, generated, answer, consent })) {
+    if (
+      run(
+        { type: "submit", jobId: job!.id, notes, generated, answer, consent },
+        { persist: currentInterview?.status === "approved" },
+      )
+    ) {
       submittedOnce.current = true;
       setSubmitted(true);
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -291,12 +316,18 @@ export function ApplyPage() {
       }
     }
   }
+  function saveDraft(value = currentInterview) {
+    return run(
+      { type: "draft", jobId: job!.id, notes, generated, answer, preInterview: value },
+      { persist: !!value },
+    );
+  }
   return (
     <section className="pp-container application-page">
       <BackLink to={`/oferty/${job.slug}`}>Wróć do oferty</BackLink>
       <header className="application-header">
         <h1>Aplikuj na ofertę</h1>
-        <p>Sprawdź ofertę i opowiedz, dlaczego pasujesz do tej roli.</p>
+        <p>Sprawdź ofertę i opowiedz o projekcie, który pokazuje Twoje doświadczenie.</p>
       </header>
       <div className="application-layout">
         <ApplicationOfferPreview job={job} />
@@ -326,9 +357,10 @@ export function ApplyPage() {
             className="application-form-section application-answer"
             aria-label="Odpowiedź do aplikacji"
           >
-            <Field label="Dlaczego pasujesz do tej roli?">
+            <Field label="Opisz projekt, który pokazuje Twoje doświadczenie">
               <Textarea
                 disabled={submitted}
+                readOnly={currentInterview?.status === "approved"}
                 ref={answerInput}
                 required
                 minLength={MIN_APPLICATION_ANSWER_LENGTH}
@@ -349,9 +381,29 @@ export function ApplyPage() {
             >
               {answerInvalid
                 ? `Odpowiedź jest za krótka. Wpisz co najmniej ${MIN_APPLICATION_ANSWER_LENGTH} znaków (obecnie: ${answerLength}).`
-                : `Minimum ${MIN_APPLICATION_ANSWER_LENGTH} znaków. Obecnie: ${answerLength}.`}
+                : `Opisz cel projektu, własne zadania i rezultat. Minimum ${MIN_APPLICATION_ANSWER_LENGTH} znaków. Obecnie: ${answerLength}.`}
             </p>
           </section>
+          <PreInterviewEditor
+            project={answer}
+            interview={currentInterview}
+            saved={interviewSaved}
+            disabled={submitted}
+            onChange={(value) => {
+              setInterview(value);
+              setConsent(false);
+            }}
+            onSave={saveDraft}
+            onApprove={() => {
+              const success = run(
+                { type: "approve_interview", jobId: job.id, consent: true },
+                { persist: true },
+              );
+              if (success) setConsent(false);
+              return success;
+            }}
+            onBusyChange={setInterviewBusy}
+          />
           <div className="application-form-section application-submit">
             <label className="application-consent">
               <Checkbox
@@ -361,10 +413,10 @@ export function ApplyPage() {
                 onCheckedChange={(v) => setConsent(v)}
                 aria-invalid={consentInvalid || undefined}
                 aria-describedby={consentInvalid ? "application-consent-error" : undefined}
-                aria-label="Zatwierdzam treść i przesłanie aplikacji"
               />
               <span>
-                Zatwierdzam treść aplikacji i przesłanie profilu oraz przykładowego CV pracodawcy.
+                Zatwierdzam treść aplikacji i przesłanie profilu, przykładowego CV oraz
+                zatwierdzonej pre-rozmowy, jeśli ją dołączam, pracodawcy.
               </span>
             </label>
             {consentInvalid && (
@@ -376,7 +428,7 @@ export function ApplyPage() {
               <Button
                 ref={sendButton}
                 type="submit"
-                disabled={submitted}
+                disabled={submitted || interviewBusy}
                 className="application-send"
               >
                 {submitted && <CheckCircle2 aria-hidden="true" />}
@@ -384,11 +436,10 @@ export function ApplyPage() {
               </Button>
               <Button
                 type="button"
-                disabled={submitted}
+                disabled={submitted || interviewBusy}
                 variant="outline"
                 onClick={() => {
-                  if (run({ type: "draft", jobId: job.id, notes, generated, answer }))
-                    setMessage("Szkic został zapisany.");
+                  if (saveDraft()) setMessage("Szkic został zapisany.");
                 }}
               >
                 Zapisz szkic
@@ -401,7 +452,8 @@ export function ApplyPage() {
               {submitted ? "Wysłano aplikację. Otwieramy listę Twoich aplikacji." : message}
             </p>
             <p className="application-help">
-              Prototyp: aplikacja zostaje w tym przeglądarkowym scenariuszu.
+              Pre-rozmowa jest dobrowolna. Dołączymy tylko zatwierdzone odpowiedzi. Prototyp:
+              aplikacja zostaje w tej przeglądarce.
             </p>
           </div>
         </form>
@@ -414,10 +466,12 @@ export function ApplicationsPage({ employer = false }: { employer?: boolean }) {
   const { state } = usePrototype();
   const person = currentPerson(state)!;
   const [query, setQuery] = useState("");
+  const [enrichedOnly, setEnrichedOnly] = useState(false);
   const [params] = useSearchParams();
   const applications = state.applications.filter(
     (x) =>
       (employer ? x.companyId === person.companyId : x.candidateId === person.id) &&
+      (!employer || !enrichedOnly || !!x.preInterview) &&
       `${x.candidateName} ${x.jobTitle}`
         .toLocaleLowerCase("pl")
         .includes(query.toLocaleLowerCase("pl")),
@@ -433,6 +487,24 @@ export function ApplicationsPage({ employer = false }: { employer?: boolean }) {
       <Field label={employer ? "Szukaj kandydata lub oferty" : "Szukaj oferty"}>
         <Input value={query} onChange={(e) => setQuery(e.target.value)} />
       </Field>
+      {employer && (
+        <div className="pre-list-filters" role="group" aria-label="Filtr pre-rozmowy">
+          <Button
+            variant="outline"
+            aria-pressed={!enrichedOnly}
+            onClick={() => setEnrichedOnly(false)}
+          >
+            Wszyscy
+          </Button>
+          <Button
+            variant="outline"
+            aria-pressed={enrichedOnly}
+            onClick={() => setEnrichedOnly(true)}
+          >
+            Z pre-rozmową
+          </Button>
+        </div>
+      )}
       <div className="mt-6 space-y-4">
         {applications.length ? (
           applications.map((a) => (
@@ -451,6 +523,7 @@ export function ApplicationsPage({ employer = false }: { employer?: boolean }) {
                       : state.companies.find((x) => x.id === a.companyId)?.name}
                   </p>
                   <p>{stageLabels[a.stage]}</p>
+                  {a.preInterview && <span className="pre-badge">Pre-rozmowa · 3 odpowiedzi</span>}
                 </div>
                 <MatchScore score={a.score} />
               </div>

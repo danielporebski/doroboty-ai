@@ -45,6 +45,8 @@ const entries = [
   "scripts/verify",
   "scripts/package-participant.mjs",
   "scripts/verify-participant.mjs",
+  "scripts/release.mjs",
+  "docs/RELEASE.md",
   "docs/architecture.md",
   "docs/design-system",
   "docs/PARTICIPANT_GUIDE.md",
