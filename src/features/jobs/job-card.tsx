@@ -1,4 +1,3 @@
-import { usePostHog } from "@posthog/react";
 import { Link } from "react-router";
 import { ArrowUpRight, Bookmark, MapPin, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import { CompanyLogo } from "./company-logo";
 import { SalaryFact } from "./salary-fact";
 export function JobCard({ job, saved }: { job: JobWithCompany; saved?: boolean }) {
   const { run } = usePrototype();
-  const posthog = usePostHog();
   return (
     <article className="pp-job-card">
       <CompanyLogo company={job.company} />
@@ -51,16 +49,7 @@ export function JobCard({ job, saved }: { job: JobWithCompany; saved?: boolean }
               size="icon-sm"
               aria-label={`Zapisz ofertę: ${job.title}`}
               aria-pressed={saved}
-              onClick={() => {
-                if (
-                  run({ type: "toggle_saved", jobId: job.id }) &&
-                  import.meta.env.VITE_POSTHOG_KEY
-                )
-                  posthog?.capture("job_save_toggled", {
-                    job_id: job.id,
-                    action: saved ? "removed" : "saved",
-                  });
-              }}
+              onClick={() => run({ type: "toggle_saved", jobId: job.id })}
             >
               <Bookmark className="pp-icon" />
             </Button>

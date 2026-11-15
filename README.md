@@ -26,6 +26,14 @@ npm run dev
 
 Open http://127.0.0.1:3001. No environment file, account, database or additional service is required. Package installation requires access to the npm registry.
 
+## Optional PostHog analytics
+
+The app's only event property is a fixed screen category in `prototype_screen_viewed` events. It does not send full URLs, query strings, search terms, form values, persona or record IDs, CVs, notes, transcripts or audio. Automatic click/input capture, session replay, person profiles and browser persistence are disabled. PostHog still attaches a temporary anonymous technical ID while the page is open. Analytics remains off unless `VITE_POSTHOG_ENABLED=true` and a project token are both configured.
+
+For local testing, copy `.env.example` to `.env.local`, then set `VITE_POSTHOG_ENABLED=true` and `VITE_POSTHOG_PROJECT_TOKEN` from the PostHog project's settings. The host defaults to EU ingestion at `https://eu.i.posthog.com`. The project token is a public client token and is included in the built JavaScript when enabled.
+
+For a deployed build, set those variables in the hosting provider's build environment and redeploy. Before enabling collection, turn on **Discard client IP data** in the PostHog project settings; PostHog otherwise receives the client IP with capture requests. See [PostHog's React setup](https://posthog.com/docs/libraries/react) and [IP data control](https://posthog.com/tutorials/web-redact-properties).
+
 Select Anna or Marek as a candidate, Karolina or Tomasz as an employer, or the instructor. Publish a job, apply, switch person and record the employer decision. Changes survive reload in this browser; settings provide export, import and reset. AI and scores simulate prepared scenarios. Use example CVs only.
 
 ## Build and verify

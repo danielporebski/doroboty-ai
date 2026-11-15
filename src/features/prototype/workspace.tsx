@@ -1,4 +1,3 @@
-import { usePostHog } from "@posthog/react";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router";
 import { CheckCircle2, FileText } from "lucide-react";
@@ -144,7 +143,6 @@ export function WorkspaceHome() {
 }
 export function ProfilePage({ preview = false }: { preview?: boolean }) {
   const { state, run } = usePrototype();
-  const posthog = usePostHog();
   const person = currentPerson(state)!;
   const [message, setMessage] = useState("");
   function save(e: FormEvent<HTMLFormElement>) {
@@ -160,10 +158,8 @@ export function ProfilePage({ preview = false }: { preview?: boolean }) {
           location: String(data.get("location")),
         },
       })
-    ) {
-      if (import.meta.env.VITE_POSTHOG_KEY) posthog?.capture("profile_updated");
+    )
       setMessage("Profil został zapisany.");
-    }
   }
   return (
     <>
@@ -238,7 +234,6 @@ export function SavedPage() {
 export function ApplyPage() {
   const { slug } = useParams();
   const { state, run } = usePrototype();
-  const posthog = usePostHog();
   const person = currentPerson(state)!;
   const navigate = useNavigate();
   const job = publishedJobs(state).find((x) => x.slug === slug);
@@ -312,11 +307,6 @@ export function ApplyPage() {
         { persist: currentInterview?.status === "approved" },
       )
     ) {
-      if (import.meta.env.VITE_POSTHOG_KEY)
-        posthog?.capture("application_submitted", {
-          job_id: job!.id,
-          has_pre_interview: currentInterview?.status === "approved",
-        });
       submittedOnce.current = true;
       setSubmitted(true);
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -327,16 +317,10 @@ export function ApplyPage() {
     }
   }
   function saveDraft(value = currentInterview) {
-    const saved = run(
+    return run(
       { type: "draft", jobId: job!.id, notes, generated, answer, preInterview: value },
       { persist: !!value },
     );
-    if (saved && import.meta.env.VITE_POSTHOG_KEY)
-      posthog?.capture("application_draft_saved", {
-        job_id: job!.id,
-        has_pre_interview: Boolean(value),
-      });
-    return saved;
   }
   return (
     <section className="pp-container application-page">
@@ -415,11 +399,7 @@ export function ApplyPage() {
                 { type: "approve_interview", jobId: job.id, consent: true },
                 { persist: true },
               );
-              if (success) {
-                if (import.meta.env.VITE_POSTHOG_KEY)
-                  posthog?.capture("pre_interview_approved", { job_id: job.id });
-                setConsent(false);
-              }
+              if (success) setConsent(false);
               return success;
             }}
             onBusyChange={setInterviewBusy}

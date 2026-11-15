@@ -1,8 +1,5 @@
-import { usePostHog } from "@posthog/react";
-import { useEffect, useRef } from "react";
 import { HashRouter, Routes, Route, Navigate } from "react-router";
-import { currentPerson } from "./model";
-import { PrototypeProvider, usePrototype } from "./store";
+import { PrototypeProvider } from "./store";
 import { Shell, NotFound } from "./shell";
 import HomePage from "./home";
 import MethodologyPage from "./methodology";
@@ -20,37 +17,7 @@ import {
 import { EmployerJobs, EmployerJobEditor, CompanyEditor } from "./employer";
 import { SettingsPage, PrivacyPage } from "./settings";
 import { CasePage } from "./case";
-
-function PrototypeIdentity() {
-  const { state } = usePrototype();
-  const posthog = usePostHog();
-  const identifiedPersonId = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!posthog || !import.meta.env.VITE_POSTHOG_KEY) return;
-
-    const person = currentPerson(state);
-    if (!person) {
-      if (identifiedPersonId.current !== null) {
-        posthog.logger.info("prototype_profile_cleared");
-        posthog.reset();
-        identifiedPersonId.current = null;
-      }
-      return;
-    }
-
-    if (identifiedPersonId.current === person.id) return;
-
-    if (identifiedPersonId.current !== null) posthog.reset();
-
-    posthog.identify(person.id, { name: person.name, role: person.role });
-    posthog.logger.info("prototype_profile_activated", { role: person.role });
-    identifiedPersonId.current = person.id;
-  }, [posthog, state]);
-
-  return null;
-}
-
+import { ScreenTracker } from "../analytics/screen-tracker";
 function AppRoutes() {
   return (
     <Routes>
@@ -184,8 +151,8 @@ function AppRoutes() {
 export function App() {
   return (
     <PrototypeProvider>
-      <PrototypeIdentity />
       <HashRouter>
+        <ScreenTracker />
         <AppRoutes />
       </HashRouter>
     </PrototypeProvider>
