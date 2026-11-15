@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -68,6 +69,7 @@ export function EmployerJobs() {
 export function EmployerJobEditor() {
   const { id } = useParams();
   const { state, run } = usePrototype();
+  const posthog = usePostHog();
   const person = currentPerson(state)!;
   const navigate = useNavigate();
   const existing = state.jobs.find((x) => x.id === id && x.companyId === person.companyId);
@@ -133,7 +135,11 @@ export function EmployerJobEditor() {
       );
       return;
     }
-    if (run({ type: "publish", job: parsed.data })) navigate("/app/oferty");
+    if (run({ type: "publish", job: parsed.data })) {
+      if (import.meta.env.VITE_POSTHOG_KEY)
+        posthog?.capture("job_published", { job_id: parsed.data.id, is_new: !existing });
+      navigate("/app/oferty");
+    }
   }
   return (
     <>
@@ -274,6 +280,7 @@ export function EmployerJobEditor() {
 }
 export function CompanyEditor() {
   const { state, run } = usePrototype();
+  const posthog = usePostHog();
   const person = currentPerson(state)!;
   const company = state.companies.find((x) => x.id === person.companyId)!;
   const [message, setMessage] = useState("");
@@ -286,8 +293,10 @@ export function CompanyEditor() {
         name: String(data.get("name")),
         description: String(data.get("description")),
       })
-    )
+    ) {
+      if (import.meta.env.VITE_POSTHOG_KEY) posthog?.capture("company_profile_saved");
       setMessage("Dane firmy zostały zapisane.");
+    }
   }
   return (
     <>
